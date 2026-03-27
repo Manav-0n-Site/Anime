@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shinobi Select | 15 Characters Live</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #a30000;
+            --text-white: #ffffff;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            font-family: 'Arial Black', sans-serif;
+            color: var(--text-white);
+            overflow: hidden;
+            transition: background-color 0.8s ease;
+        }
+
+        .hero-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- UI & Nav --- */
+        .top-nav {
+            position: absolute;
+            top: 40px;
+            left: 5%;
+            right: 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+        .social-icons a { color: #000; font-size: 24px; margin-left: 20px; text-decoration: none; transition: 0.3s; }
+        .social-icons a:hover { transform: scale(1.5); color: white; }
+
+
+        .random-img { 
+    position: absolute; 
+    width: 1000px; 
+    z-index: 5; 
+    opacity: 0.1; 
+    /* This makes the rotation smooth when the class changes */
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease;
+    transform-origin: center;
+}
+
+/* Position for V3 */
+.v3 { 
+    position: absolute;
+    bottom: -30.5%; /* Adjust as needed */
+    left: 0%;   /* Adjust as needed */
+    width: 1500px;
+    z-index: 5; 
+    opacity: 0.1;
+    /* Smooth transition for the rotation */
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s;
+    transform-origin: center;
+}
+
+
+        /* --- ORIGINAL WORD TRANSITIONS --- */
+        .text-wrap { display: flex; flex-direction: column; align-items: center; z-index: 10; pointer-events: none; }
+        .text-wrap h1 { font-size: 8.5vw; margin: -1vw 0; line-height: 1; letter-spacing: -2px; transition: 0.6s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
+        .outline { color: transparent; -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.4); }
+
+        .character-img { position: absolute; bottom: 0; height: 95vh; z-index: 50; transition: 0.8s ease-in-out; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5)); /* THE SHADOW LOGIC */
+    /* Parameters: X-offset, Y-offset, Blur-radius, Color */
+    filter: drop-shadow(-20px 10px 40px rgba(0, 0, 0, 0.7)); 
+}
+
+        .bottom-ui {
+            position: absolute;
+            bottom: 40px;
+            left: 5%;
+            right: 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            z-index: 100;
+        }
+        .description { width: 280px; font-family: 'Arial', sans-serif; font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 1.5px; line-height: 1.4; }
+
+        /* --- LIQUID FILL BUTTON --- */
+        .next-btn { 
+            background: transparent;
+            color: #fff;
+            border: 2px solid #fff;
+            padding: 12px 35px;
+            border-radius: 30px;
+            font-weight: 900;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: color 0.4s ease;
+            text-transform: uppercase;
+        }
+        .next-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            transition: all 0.4s ease;
+            z-index: -1;
+        }
+        .next-btn:hover::before { left: 0; }
+        .next-btn:hover { color: #000; }
+
+        /* Animation Classes */
+        .slide-left { transform: translateX(-150%); opacity: 0; }
+        .slide-right { transform: translateX(150%); opacity: 0; }
+    </style>
+</head>
+<body id="bg-body">
+
+    <div class="hero-container">
+        <nav class="top-nav">
+            <div id="nav-name" style="line-height: 1;">MADARA<br>UCHIHA</div>
+            <div class="social-icons">
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-github"></i></a>
+                <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+            </div>
+        </nav>
+
+       <img src="img/reningan.png" id="v3" class="random-img v3">
+
+        <div class="text-wrap">
+            <h1 id="t1">MADARA</h1>
+            <h1 id="t2">UCHIHA</h1>
+            <h1 id="t3" class="outline">SHIPPUDEN</h1>
+        </div>
+
+        <img src="https://freepngimg.com/thumb/anime/120006-uchiha-madara-free-download-png-hd.png" class="character-img" id="char-img">
+
+        <div class="bottom-ui">
+            <div class="description" id="desc">Wake up to reality! Nothing ever goes as planned in this world.</div>
+            <button class="next-btn" onclick="changeCharacter()">Next Shinobi</button>
+        </div>
+    </div>
+
+    <audio id="shinobi-voice"></audio>
+
+    <script>
+        let index = 0;
+
+        const shinobi = [
+            { name: "MADARA<br>UCHIHA", t1: "MADARA", t2: "UCHIHA", t3: "SHIPPUDEN", desc: "Wake up to reality! Nothing ever goes as planned in this world.", img: "https://freepngimg.com/thumb/anime/120006-uchiha-madara-free-download-png-hd.png", bg: "#a30000", voice: " audio/madara.mp3" },
+            { name: "NARUTO<br>UZUMAKI", t1: "NARUTO", t2: "UZUMAKI", t3: "HOKAGE", desc: "I'm Naruto Uzumaki! I'm gonna be the next Hokage, dattebayo!", img: "https://www.pngplay.com/wp-content/uploads/12/Naruto-Uzumaki-Background-PNG-Image.png", bg: "#e67e22", voice: "audio/naruto.mp3" },
+            { name: "SASUKE<br>UCHIHA", t1: "SASUKE", t2: "UCHIHA", t3: "AVENGER", desc: "I have long since closed my eyes... my only goal is in the darkness.", img: "img/sasuke.png", bg: "#2c3e50", voice: "audio/sasuke.mp3" },
+            { name: "KAKASHI<br>HATAKE", t1: "KAKASHI", t2: "HATAKE", t3: "COPY NINJA", desc: "In the ninja world, those who break the rules are scum.", img: "img/kakashi.png", bg: "#34495e", voice: "audio/kakashi.mp3" },
+            { name: "ITACHI<br>UCHIHA", t1: "ITACHI", t2: "UCHIHA", t3: "AKATSUKI", desc: "People live their lives bound by what they accept as correct.", img: "img/itachi.png", bg: "#4a0000", voice: "audio/itachi.mp3" },
+            { name: "MINATO<br>NAMIKAZE", t1: "MINATO", t2: "NAMIKAZE", t3: "YELLOW FLASH", desc: "To be a ninja is to confront hatred... I will protect the village.", img: "img/minato.png", bg: "#d4ac0d", voice: "audio/minato.mp3" },
+            { name: "PAIN<br>(NAGATO)", t1: "PAIN", t2: "AKATSUKI", t3: "GOD", desc: "The world shall know pain. Almighty Push!", img: "img/pain.png", bg: "#512e5f", voice: "audio/pain.mp3" },
+            { name: "JIRAIYA<br>SAMA", t1: "JIRAIYA", t2: "SENSEI", t3: "SANNIN", desc: "A person’s true worth is not how they lived, but what they did before death.", img: "img/jiraya.png", bg: "#922b21", voice: "audio/jiraya.mp3" },
+            { name: "OBITO<br>UCHIHA", t1: "OBITO", t2: "UCHIHA", t3: "MASKED MAN", desc: "I am no one. I don't want to be anyone.", img: "img/obito.png", bg: "#17202a", voice: "audio/obito.mp3" },
+            { name: "HASHIRAMA<br>SENJU", t1: "HASHIRAMA", t2: "SENJU", t3: "HOKAGE", desc: "The village is my family. I will protect it with my life.", img: "img/hashirama.png", bg: "#145a32", voice: "audio/hashirama.mp3" },
+            { name: "GAARA<br>SAMA", t1: "GAARA", t2: "KAZEKAGE", t3: "SAND", desc: "Perhaps the companion of an evil person is another lonely person.", img: "img/garaa.png", bg: "#784212", voice: "audio/gara.mp3" },
+            { name: "HINATA<br>HYUGA", t1: "HINATA", t2: "HYUGA", t3: "BYAKUGAN", desc: "I will never go back on my word... that's my nindo too.", img: "img/hinata.png", bg: "#1b2631", voice: "audio/hinata.mp3" },
+            { name: "MIGHT<br>GUY", t1: "MIGHT", t2: "GUY", t3: "8 GATES", desc: "Look at the springtime of youth! Night Guy!", img: "img/mightguy.png", bg: "#1e8449", voice: "audio/mightguy.mp3" },
+            { name: "ROCK<br>LEE", t1: "ROCK", t2: "LEE", t3: "TAIJUTSU", desc: "A genius, huh? What does that mean? I'll show you hard work!", img: "img/rocklee.png", bg: "#196f3d", voice: "audio/rocklee.mp3" },
+            { name: "TSUNADE<br>SAMA", t1: "TSUNADE", t2: "HOKAGE", t3: "SANNIN", desc: "People become stronger because they have memories they can't forget.", img: "img/tsunade.png", bg: "#0e6251", voice: "audio/tsunade.mp3" },
+            { name: "SAKURA<br>HARUNO", t1: "SAKURA", t2: "HARUNO", t3: "KUNOICHI", desc: "The ones who should be the most careful are those who think they're safe! CHA!", img: "img/sakura.png", bg: "#e91e63", voice: "audio/sakura.mp3" }
+        ];
+let currentRotation = 0; // Global variable to keep track of total rotation
+
+function changeCharacter() {
+    // 1. Animate Out
+    document.getElementById('t1').classList.add('slide-left');
+    document.getElementById('t2').classList.add('slide-right');
+    document.getElementById('char-img').style.opacity = "0";
+
+    // 2. Add 180 degrees to the current rotation every click
+    currentRotation += 180;
+    const v3Image = document.getElementById('v3');
+    v3Image.style.transform = `rotate(${currentRotation}deg)`;
+
+    setTimeout(() => {
+        index = (index + 1) % shinobi.length;
+        const data = shinobi[index];
+
+        // 3. Update Content
+        document.getElementById('bg-body').style.backgroundColor = data.bg;
+        document.getElementById('nav-name').innerHTML = data.name;
+        document.getElementById('t1').innerText = data.t1;
+        document.getElementById('t2').innerText = data.t2;
+        document.getElementById('t3').innerText = data.t3;
+        document.getElementById('desc').innerText = data.desc;
+        document.getElementById('char-img').src = data.img;
+
+        // IMPORTANT: Update the v3 image source for the new character
+        // If data.v3 is empty, the image will disappear!
+        if(data.v3) {
+            v3Image.src = data.v3;
+            v3Image.style.opacity = "0.5";
+        }
+
+        // Play Voice
+        const audio = document.getElementById('shinobi-voice');
+        audio.src = data.voice;
+        audio.play().catch(e => console.log("Voice pending click"));
+
+        // 4. Animate In
+        document.getElementById('t1').classList.remove('slide-left');
+        document.getElementById('t2').classList.remove('slide-right');
+        document.getElementById('char-img').style.opacity = "1";
+    }, 600);
+}
+    </script>
+</body>
+</html>
