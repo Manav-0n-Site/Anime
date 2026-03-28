@@ -1,6 +1,6 @@
 <td align="center" width="33%">
 
-<img src="img/sasuke.png" width="180"/>
+<img src="img/madara.png" width="180"/>
 
 ### ⚡ Sasuke Uchiha  
 `S-RANK`
