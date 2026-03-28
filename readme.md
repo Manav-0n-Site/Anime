@@ -1,6 +1,6 @@
-<td align="center" width="33%">
+<td align="center" width="50%">
 
-<img src="img/obito.png" width="180"/>
+<img src="img/obito.png" width="1800"/>
 
 ### ⚡ Sasuke Uchiha  
 `S-RANK`
